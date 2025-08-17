@@ -16,7 +16,7 @@ namespace Portfolio.API.Controllers
             _skillDetailService = skillDetailService;
         }
 
-        [HttpPost("add")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -37,7 +37,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -58,7 +58,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpGet("get")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -74,7 +74,7 @@ namespace Portfolio.API.Controllers
 
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

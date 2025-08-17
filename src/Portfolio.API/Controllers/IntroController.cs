@@ -14,7 +14,7 @@ namespace Portfolio.API.Controllers
             _introService = introService;
         }
 
-        [HttpPost("addorupdate")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -35,7 +35,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpGet("get")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

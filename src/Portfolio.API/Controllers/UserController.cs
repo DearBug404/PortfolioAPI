@@ -19,7 +19,7 @@ namespace Portfolio.API.Controllers
             _userService = userService;
         }
 
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,7 +43,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpPut("changepassword/{id}")]
+        [HttpPut("{id}/password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -58,7 +58,7 @@ namespace Portfolio.API.Controllers
             return Ok(new { Message = "Password updated successfully." });
         }
 
-        [HttpGet("get")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -80,7 +80,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpGet("get/{id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,7 +102,7 @@ namespace Portfolio.API.Controllers
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

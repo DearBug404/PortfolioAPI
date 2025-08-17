@@ -14,7 +14,7 @@ namespace Portfolio.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("forgotpassword")]
+        [HttpPost("forgot")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -29,7 +29,7 @@ namespace Portfolio.API.Controllers
             return Ok("Reset password token sent to your email.");
         }
 
-        [HttpPost("resetpassword")]
+        [HttpPost("reset")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
