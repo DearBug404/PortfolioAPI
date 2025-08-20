@@ -1,7 +1,9 @@
 ﻿
+using Portfolio.Domain.Common;
+
 namespace Portfolio.Domain.Entities
 {
-    public class SkillSection
+    public class SkillSection : AddUpdateAuditEntities
     {
         public Guid Id { get; set; }
         public string? SkillSectionTitle { get; set; }
