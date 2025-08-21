@@ -26,15 +26,14 @@ namespace Portfolio.Infrastructure.Service
                 File.Delete(filePath);
             }
 
-            var originalFileName = Path.GetFileName(file.FileName);
-            var physicalPath = Path.Combine(folderPath, originalFileName);
+            var dbFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var physicalPath = Path.Combine(folderPath, dbFileName);
 
             using (var stream = new FileStream(physicalPath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
 
-            var dbFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
             return Path.Combine("/", folderName, dbFileName).Replace("\\", "/");
         }
         #endregion
