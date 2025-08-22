@@ -34,7 +34,7 @@ namespace Portfolio.Infrastructure.Service
                 await file.CopyToAsync(stream);
             }
 
-            return Path.Combine("/", folderName, dbFileName).Replace("\\", "/");
+            return dbFileName;
         }
         #endregion
 

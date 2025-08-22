@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Portfolio.Application.DTOs;
 using Portfolio.Application.Interfaces;
@@ -10,6 +11,7 @@ namespace Portfolio.Infrastructure.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _env;
         private readonly IFileStorageService _fileStorageService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private const string IntroFolder = "IntroImages";
@@ -18,11 +20,13 @@ namespace Portfolio.Infrastructure.Service
         public IntroService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IWebHostEnvironment env,
             IFileStorageService fileStorageService,
             IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _env = env;
             _fileStorageService = fileStorageService;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -74,11 +78,11 @@ namespace Portfolio.Infrastructure.Service
 
             var introDto = _mapper.Map<IntroViewDto>(intro);
 
-            var introImageFullPath = BuildFileUrl(IntroFolder, intro.IntroImagePath);
-            var resumeFullPath = BuildFileUrl(ResumeFolder, intro.ResumePath);
+            var introImageName = GetFileFromFolder(IntroFolder);
+            var resumeFileName = GetFileFromFolder(ResumeFolder);
 
-            introDto.IntroImagePath = introImageFullPath;
-            introDto.ResumePath = resumeFullPath;
+            introDto.IntroImagePath = introImageName != null ? $"{GetBaseUrl()}/{IntroFolder}/{introImageName}" : null;
+            introDto.ResumePath = resumeFileName != null ? $"{GetBaseUrl()}/{ResumeFolder}/{resumeFileName}" : null;
 
             return introDto;
         }
@@ -91,14 +95,14 @@ namespace Portfolio.Infrastructure.Service
             return $"{request.Scheme}://{request.Host}";
         }
         #endregion
-
-        #region build file url
-        private string? BuildFileUrl(string folder, string? fileName)
+        private string? GetFileFromFolder(string folderName)
         {
-            if (string.IsNullOrWhiteSpace(fileName)) return null;
-            return $"{GetBaseUrl()}/{folder}/{fileName}";
+            var folderPath = Path.Combine(_env.WebRootPath, folderName);
+            return Directory.Exists(folderPath)
+                ? Directory.GetFiles(folderPath).Select(Path.GetFileName).FirstOrDefault()
+                : null;
         }
-        #endregion
+        
 
     }
 }
