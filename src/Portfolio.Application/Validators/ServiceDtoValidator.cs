@@ -1,40 +1,50 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Portfolio.Application.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Portfolio.Application.Validators
 {
-    public class ServiceDtoValidator : AbstractValidator<ServicesCreateDto>
+    public class ServiceCreateDtoValidator : AbstractValidator<ServicesCreateDto>
     {
-        public ServiceDtoValidator() 
+        public ServiceCreateDtoValidator()
         {
             RuleFor(x => x.ServiceIcon)
-               .NotNull().WithMessage("About image is required.")
-               .Must(f => f.Length > 0).When(f => f != null).WithMessage("About image cannot be empty.")
-               .Must(BeAValidIcon).WithMessage("Only JPG, JPEG, or PNG images are allowed.");
+                .NotNull().WithMessage("Service icon is required.")
+                .Must(f => f.Length > 0).WithMessage("Service icon cannot be empty.");
 
             RuleFor(x => x.ServiceName)
-                .NotEmpty().WithMessage("Service name is required.")
-                .MaximumLength(100).WithMessage("Service name cannot exceed 100 characters.");
+                .NotEmpty().MaximumLength(100);
 
-            RuleFor(x => x.ServiceDestription)
-                .NotEmpty().WithMessage("Service description is required.")
-                .MaximumLength(500).WithMessage("Service description cannot exceed 500 characters.");
-
+            RuleFor(x => x.ServiceDescription)
+                .NotEmpty().MaximumLength(500);
         }
-
-        private bool BeAValidIcon(IFormFile file)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-            var extension = Path.GetExtension(file.FileName).ToLower();
-            return allowedExtensions.Contains(extension);
-        }
-
     }
+
+    public class ServiceUpdateDtoValidator : AbstractValidator<ServicesUpdateDto>
+    {
+        public ServiceUpdateDtoValidator()
+        {
+            RuleFor(x => x.ServiceName)
+                .NotEmpty().MaximumLength(100);
+
+            RuleFor(x => x.ServiceDescription)
+                .NotEmpty().MaximumLength(500);
+
+            When(x => x.ServiceIcon != null, () =>
+            {
+                RuleFor(x => x.ServiceIcon)
+                    .Must(f => f.Length > 0).WithMessage("Invalid service icon.")
+                    .Must(BeAValidIcon).WithMessage("Only JPG, JPEG, or PNG images are allowed.");
+            });
+        }
+
+        private bool BeAValidIcon(IFormFile? file)
+        {
+            if (file == null) return true;
+            var allowed = new[] { ".jpg", ".jpeg", ".png" };
+            var ext = Path.GetExtension(file.FileName).ToLower();
+            return allowed.Contains(ext);
+        }
+    }
+
 }

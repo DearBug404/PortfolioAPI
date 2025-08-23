@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.DTOs;
+using Portfolio.Application.Exceptions;
 using Portfolio.Application.Interfaces;
 
 namespace Portfolio.API.Controllers
@@ -41,7 +42,7 @@ namespace Portfolio.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateService(Guid id, [FromForm] ServicesCreateDto dto)
+        public async Task<IActionResult> UpdateService(Guid id, [FromForm] ServicesUpdateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -66,6 +67,32 @@ namespace Portfolio.API.Controllers
         {
             var services = await _servicesService.GetAllServicesAsync();
             return Ok(services);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetServiceById(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new { Message = "Invalid ID provided." });
+            }
+
+            try
+            {
+                var service = await _servicesService.GetServiceByIdAsync(id);
+                return Ok(service);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while retrieving the service.", Details = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

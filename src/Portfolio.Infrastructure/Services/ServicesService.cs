@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Portfolio.Application.DTOs;
 using Portfolio.Application.Exceptions;
 using Portfolio.Application.Helpers;
 using Portfolio.Application.Interfaces;
+using Portfolio.Application.Validators;
 
 
 namespace Portfolio.Infrastructure.Service
@@ -36,35 +38,50 @@ namespace Portfolio.Infrastructure.Service
         #region add services
         public async Task<ServicesViewDto> AddServicesAsync(ServicesCreateDto dto)
         {
-            var existingCount = (await _unitOfWork.ServiceRepository.GetAllAsync()).Count();
+            var validator = new ServiceCreateDtoValidator();
+            var validationResult = validator.Validate(dto);
 
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
+            if (dto.ServiceIcon == null)
+            {
+                throw new ValidationException("Service icon is required.");
+            }
             Domain.Entities.Services services;
-            if (existingCount >= 6)
-            {
-                throw new InvalidOperationException("You can only add up to 6 services.");
-            }
-            else
-            {
-                var relativePath = await _fileStorageService.GenerateFilePath(ServicesIconFolder, dto.ServiceIcon.FileName);
-                var fileNameOnly = Path.GetFileName(relativePath);
 
-                _mapper.Map<Domain.Entities.Services>(dto); //Add the domain because C# is mistakenly interpreting Services as a namespace not class
-                var service = Domain.Entities.Services.Create(
-                    serviceIconPath: relativePath,
-                    serviceName: dto.ServiceName,
-                    serviceDescription: dto.ServiceDestription
-                );
-                await _unitOfWork.ServiceRepository.AddAsync(service);
-                await _unitOfWork.SaveChangesAsync();
-                await _fileStorageService.SaveFileAsync(dto.ServiceIcon, ServicesIconFolder, fileNameOnly);
-                return _mapper.Map<ServicesViewDto>(service);
-            }
+            var relativePath = await _fileStorageService.GenerateFilePath(ServicesIconFolder, dto.ServiceIcon.FileName);
+            var fileNameOnly = Path.GetFileName(relativePath);
+
+            _mapper.Map<Domain.Entities.Services>(dto); //Add the domain because C# is mistakenly interpreting Services as a namespace not class
+            var service = Domain.Entities.Services.Create(
+                serviceIconPath: relativePath,
+                serviceName: dto.ServiceName,
+                serviceDescription: dto.ServiceDescription
+            );
+            await _unitOfWork.ServiceRepository.AddAsync(service);
+            await _unitOfWork.SaveChangesAsync();
+            await _fileStorageService.SaveFileAsync(dto.ServiceIcon, ServicesIconFolder, fileNameOnly);
+            return _mapper.Map<ServicesViewDto>(service);
+
         }
         #endregion
 
         #region update services
-        public async Task<ServicesViewDto> UpdateServiceAsync(Guid id, ServicesCreateDto dto)
+        public async Task<ServicesViewDto> UpdateServiceAsync(Guid id, ServicesUpdateDto dto)
         {
+            var validator = new ServiceUpdateDtoValidator();
+            var validationResult = validator.Validate(dto);
+
+            if (!validationResult.IsValid)
+            {
+               
+                throw new ValidationException(validationResult.Errors);
+            }
+
+
             var service = await _unitOfWork.ServiceRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException("No services found.");
 
@@ -85,7 +102,7 @@ namespace Portfolio.Infrastructure.Service
 
             service.Update(
                 serviceName: dto.ServiceName,
-                serviceDescription: dto.ServiceDestription,
+                serviceDescription: dto.ServiceDescription,
                 serviceIconPath: updatedFilePath
             );
 
@@ -111,6 +128,21 @@ namespace Portfolio.Infrastructure.Service
             .ToList();
         }
 
+        #endregion
+
+        #region get service by id
+        public async Task<ServicesViewDto> GetServiceByIdAsync(Guid id)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException("Service not found.");
+
+            var baseUrl = GetBaseUrl();
+            var servicesViewDto = _mapper.Map<ServicesViewDto>(service);
+
+            servicesViewDto.ServiceIcon = GenerateFullIconUrl(baseUrl, service.ServiceIconPath);
+
+            return servicesViewDto;
+        }
         #endregion
 
         #region delete services

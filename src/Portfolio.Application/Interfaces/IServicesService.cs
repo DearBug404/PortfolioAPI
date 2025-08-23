@@ -7,7 +7,8 @@ namespace Portfolio.Application.Interfaces
     {
         Task<ServicesViewDto> AddServicesAsync(ServicesCreateDto dto);
         Task<IEnumerable<ServicesViewDto>> GetAllServicesAsync();
-        Task<ServicesViewDto> UpdateServiceAsync(Guid id, ServicesCreateDto dto);
+        Task<ServicesViewDto> GetServiceByIdAsync(Guid id);
+        Task<ServicesViewDto> UpdateServiceAsync(Guid id, ServicesUpdateDto dto);
         Task DeleteServiceAsync(Guid id);
     }
 }

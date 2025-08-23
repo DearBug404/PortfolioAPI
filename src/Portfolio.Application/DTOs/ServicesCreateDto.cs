@@ -6,6 +6,6 @@ namespace Portfolio.Application.DTOs
     {
         public IFormFile ServiceIcon { get; set; }
         public string ServiceName { get; set; }
-        public string ServiceDestription { get; set; }
+        public string ServiceDescription { get; set; }
     }
 }
